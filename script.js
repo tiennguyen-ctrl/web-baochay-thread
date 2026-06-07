@@ -185,9 +185,9 @@ const statusText  = el('status-text');
 document.addEventListener('click', () => { audioUnlocked = true; }, { once: true });
 
 function checkAlerts() {
-  // Cảnh báo chỉ khi CẢ HAI thông số của cùng một node vượt ngưỡng
+  // Cảnh báo khi MỘT TRONG HAI thông số của bất kỳ node nào vượt ngưỡng
   const fire = Object.values(latestData).some(
-    d => d.temperature > TEMP_THRESHOLD && d.co2 > CO2_THRESHOLD
+    d => d.temperature > TEMP_THRESHOLD || d.co2 > CO2_THRESHOLD
   );
 
   if (fire) {
