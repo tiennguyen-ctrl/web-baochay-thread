@@ -194,11 +194,17 @@ function checkAlerts() {
     statusText.textContent  = 'CẢNH BÁO: CÓ CHÁY!';
     statusEl.className      = 'system-status danger';
     document.body.classList.add('fire-alert');
-    if (audioUnlocked && alarmEl.paused) alarmEl.play().catch(() => {});
+    if (alarmEl.paused) {
+      alarmEl.play().catch(() => {
+        // Browser blocked autoplay — hiện nút yêu cầu người dùng bấm
+        document.getElementById('audio-prompt').style.display = 'flex';
+      });
+    }
   } else {
     statusText.textContent  = 'HỆ THỐNG AN TOÀN';
     statusEl.className      = 'system-status safe';
     document.body.classList.remove('fire-alert');
+    document.getElementById('audio-prompt').style.display = 'none';
     if (!alarmEl.paused) { alarmEl.pause(); alarmEl.currentTime = 0; }
   }
 }
