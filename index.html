@@ -187,8 +187,13 @@
 
   </main>
 
-  <div id="audio-prompt" onclick="document.getElementById('alarm-sound').play(); this.style.display='none';">
-    BẤM ĐÂY ĐỂ BẬT CÒIOI
+  <div id="start-overlay">
+    <div class="start-box">
+      <div class="start-flame"></div>
+      <h2>HỆ THỐNG GIÁM SÁT & BÁO CHÁY</h2>
+      <p>Nhấn để bắt đầu — âm thanh cảnh báo sẽ tự động kích hoạt khi phát hiện nguy hiểm</p>
+      <button id="start-btn">BẮT ĐẦU GIÁM SÁT</button>
+    </div>
   </div>
 
   <audio id="alarm-sound" src="coi.mp3" loop></audio>
