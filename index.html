@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HỆ THỐNG GIÁM SÁT & BÁO CHÁY</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-brand">
+      <div class="brand-icon"></div>
+      <h1>HỆ THỐNG GIÁM SÁT &amp; BÁO CHÁY REAL-TIME MẠNG THREAD</h1>
+    </div>
+    <div id="connection-status" class="conn-badge connecting">Đang kết nối...</div>
+  </header>
+
+  <div id="system-status" class="system-status safe">
+    <span class="status-dot"></span>
+    <span class="status-text" id="status-text">HỆ THỐNG AN TOÀN</span>
+  </div>
+
+  <main class="nodes-grid">
+
+    <!-- THIẾT BỊ 01 – Router_H2 -->
+    <div class="node-card" id="card-h2">
+      <div class="node-header">
+        <div class="node-info">
+          <span class="node-num">01</span>
+          <div>
+            <div class="node-name">Router_H2</div>
+            <div class="node-label">THIẾT BỊ 01</div>
+          </div>
+        </div>
+        <span class="status-badge offline" id="badge-h2">OFFLINE</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart-h2"></canvas>
+      </div>
+      <div class="metrics-row">
+        <div class="metric temp">
+          <div class="m-val" id="temp-h2">--</div>
+          <div class="m-unit">°C</div>
+          <div class="m-label">Nhiệt Độ</div>
+        </div>
+        <div class="metric hum">
+          <div class="m-val" id="hum-h2">--</div>
+          <div class="m-unit">%</div>
+          <div class="m-label">Độ Ẩm</div>
+        </div>
+        <div class="metric co2">
+          <div class="m-val" id="co2-h2">--</div>
+          <div class="m-unit">ppm</div>
+          <div class="m-label">CO₂</div>
+        </div>
+        <div class="metric tvoc">
+          <div class="m-val" id="tvoc-h2">--</div>
+          <div class="m-unit">ppb</div>
+          <div class="m-label">TVOC</div>
+        </div>
+      </div>
+      <div class="last-seen">Last Seen: <span id="seen-h2">---</span></div>
+    </div>
+
+    <!-- THIẾT BỊ 02 – Node_b6f:2e9b -->
+    <div class="node-card" id="card-b6f">
+      <div class="node-header">
+        <div class="node-info">
+          <span class="node-num">02</span>
+          <div>
+            <div class="node-name">Node_b6f:2e9b</div>
+            <div class="node-label">THIẾT BỊ 02</div>
+          </div>
+        </div>
+        <span class="status-badge offline" id="badge-b6f">OFFLINE</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart-b6f"></canvas>
+      </div>
+      <div class="metrics-row">
+        <div class="metric temp">
+          <div class="m-val" id="temp-b6f">--</div>
+          <div class="m-unit">°C</div>
+          <div class="m-label">Nhiệt Độ</div>
+        </div>
+        <div class="metric hum">
+          <div class="m-val" id="hum-b6f">--</div>
+          <div class="m-unit">%</div>
+          <div class="m-label">Độ Ẩm</div>
+        </div>
+        <div class="metric co2">
+          <div class="m-val" id="co2-b6f">--</div>
+          <div class="m-unit">ppm</div>
+          <div class="m-label">CO₂</div>
+        </div>
+        <div class="metric tvoc">
+          <div class="m-val" id="tvoc-b6f">--</div>
+          <div class="m-unit">ppb</div>
+          <div class="m-label">TVOC</div>
+        </div>
+      </div>
+      <div class="last-seen">Last Seen: <span id="seen-b6f">---</span></div>
+    </div>
+
+    <!-- THIẾT BỊ 03 – Node3 -->
+    <div class="node-card" id="card-n3">
+      <div class="node-header">
+        <div class="node-info">
+          <span class="node-num">03</span>
+          <div>
+            <div class="node-name">Node3</div>
+            <div class="node-label">THIẾT BỊ 03</div>
+          </div>
+        </div>
+        <span class="status-badge offline" id="badge-n3">OFFLINE</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart-n3"></canvas>
+      </div>
+      <div class="metrics-row">
+        <div class="metric temp">
+          <div class="m-val" id="temp-n3">--</div>
+          <div class="m-unit">°C</div>
+          <div class="m-label">Nhiệt Độ</div>
+        </div>
+        <div class="metric hum">
+          <div class="m-val" id="hum-n3">--</div>
+          <div class="m-unit">%</div>
+          <div class="m-label">Độ Ẩm</div>
+        </div>
+        <div class="metric co2">
+          <div class="m-val" id="co2-n3">--</div>
+          <div class="m-unit">ppm</div>
+          <div class="m-label">CO₂</div>
+        </div>
+        <div class="metric tvoc">
+          <div class="m-val" id="tvoc-n3">--</div>
+          <div class="m-unit">ppb</div>
+          <div class="m-label">TVOC</div>
+        </div>
+      </div>
+      <div class="last-seen">Last Seen: <span id="seen-n3">---</span></div>
+    </div>
+
+    <!-- THIẾT BỊ 04 – Node4 -->
+    <div class="node-card" id="card-n4">
+      <div class="node-header">
+        <div class="node-info">
+          <span class="node-num">04</span>
+          <div>
+            <div class="node-name">Node4</div>
+            <div class="node-label">THIẾT BỊ 04</div>
+          </div>
+        </div>
+        <span class="status-badge offline" id="badge-n4">OFFLINE</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="chart-n4"></canvas>
+      </div>
+      <div class="metrics-row">
+        <div class="metric temp">
+          <div class="m-val" id="temp-n4">--</div>
+          <div class="m-unit">°C</div>
+          <div class="m-label">Nhiệt Độ</div>
+        </div>
+        <div class="metric hum">
+          <div class="m-val" id="hum-n4">--</div>
+          <div class="m-unit">%</div>
+          <div class="m-label">Độ Ẩm</div>
+        </div>
+        <div class="metric co2">
+          <div class="m-val" id="co2-n4">--</div>
+          <div class="m-unit">ppm</div>
+          <div class="m-label">CO₂</div>
+        </div>
+        <div class="metric tvoc">
+          <div class="m-val" id="tvoc-n4">--</div>
+          <div class="m-unit">ppb</div>
+          <div class="m-label">TVOC</div>
+        </div>
+      </div>
+      <div class="last-seen">Last Seen: <span id="seen-n4">---</span></div>
+    </div>
+
+  </main>
+
+  <audio id="alarm-sound" src="coi.mp3" loop></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
