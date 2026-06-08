@@ -16,7 +16,7 @@ const NODE_MAP = {
   'Router_H2':      'h2',
   'Node_b6f:2e9b':  'b6f',
   'Node_ac9d:b03':  'n3',
-  'Node_7f5:59fc':  'n4',
+  'Node_1e2:612b':  'n4',
 };
 
 const NODE_KEYS      = ['h2', 'b6f', 'n3', 'n4'];
