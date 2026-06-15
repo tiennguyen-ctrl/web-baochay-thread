@@ -7,7 +7,7 @@ const MQTT_PASSWORD = '72*hjEd91GyHsWSi?,P&';
 const MQTT_TOPIC    = 'sensor/#';
 
 // ── ALERT THRESHOLDS ──────────────────────────────────────────────────────────
-const TEMP_THRESHOLD = 33;    // °C
+const TEMP_THRESHOLD = 35;    // °C
 const CO2_THRESHOLD  = 2000;  // ppm
 
 // ── NODE REGISTRY ─────────────────────────────────────────────────────────────
