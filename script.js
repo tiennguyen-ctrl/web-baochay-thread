@@ -14,7 +14,7 @@ const CO2_THRESHOLD  = 2000;  // ppm
 // Maps MQTT payload.node_id → short element-key used in HTML IDs
 const NODE_MAP = {
   'Router_H2':      'h2',
-  'Node_b6f:2e9b':  'b6f',
+  'Node_ef7:c0c9':  'b6f',
   'Node_ac9d:b03':  'n3',
   'Node_1e2:612b':  'n4',
 };
