@@ -7,8 +7,10 @@ const MQTT_PASSWORD = '72*hjEd91GyHsWSi?,P&';
 const MQTT_TOPIC    = 'sensor/#';
 
 // ── ALERT THRESHOLDS ──────────────────────────────────────────────────────────
-const TEMP_THRESHOLD = 35;    // °C
-const CO2_THRESHOLD  = 2000;  // ppm
+const TEMP_WARN = 35;    // °C  – cảnh báo nhiệt độ cao (không còi)
+const CO2_WARN  = 2000;  // ppm – cảnh báo CO2 cao (không còi)
+const TEMP_FIRE = 40;    // °C  – ngưỡng xác nhận cháy (có còi)
+const CO2_FIRE  = 3000;  // ppm – ngưỡng xác nhận cháy (có còi)
 
 // ── NODE REGISTRY ─────────────────────────────────────────────────────────────
 // Maps MQTT payload.node_id → short element-key used in HTML IDs
@@ -189,20 +191,41 @@ el('start-btn').addEventListener('click', () => {
 });
 
 function checkAlerts() {
-  // Cảnh báo khi MỘT TRONG HAI thông số của bất kỳ node nào vượt ngưỡng
-  const fire = Object.values(latestData).some(
-    d => d.temperature > TEMP_THRESHOLD || d.co2 > CO2_THRESHOLD
-  );
+  // Tìm mức cảnh báo cao nhất trong tất cả các node
+  // 0 = an toàn | 1 = nhiệt độ cao | 2 = CO2 cao | 3 = nguy cơ cháy | 4 = có cháy
+  let level = 0;
 
-  if (fire) {
-    statusText.textContent  = 'CẢNH BÁO: CÓ CHÁY!';
-    statusEl.className      = 'system-status danger';
-    document.body.classList.add('fire-alert');
+  Object.values(latestData).forEach(d => {
+    const t = d.temperature;
+    const c = d.co2;
+    let nodeLevel = 0;
+
+    if      (t > TEMP_FIRE && c > CO2_FIRE)      nodeLevel = 4; // cả 2 vượt ngưỡng cháy
+    else if (t > TEMP_WARN && c > CO2_WARN)      nodeLevel = 3; // cả 2 vượt ngưỡng warn
+    else if (t > TEMP_WARN && c <= CO2_WARN)     nodeLevel = 1; // chỉ nhiệt độ cao
+    else if (c > CO2_WARN  && t <= TEMP_WARN)    nodeLevel = 2; // chỉ CO2 cao
+
+    if (nodeLevel > level) level = nodeLevel;
+  });
+
+  const STATES = {
+    0: { text: 'HỆ THỐNG AN TOÀN',           cls: 'safe',      body: '',           sound: false },
+    1: { text: 'CẢNH BÁO: NHIỆT ĐỘ CAO',     cls: 'warn-temp', body: '',           sound: false },
+    2: { text: 'CẢNH BÁO: NỒNG ĐỘ CO₂ CAO',  cls: 'warn-co2',  body: '',           sound: false },
+    3: { text: 'CẢNH BÁO: NGUY CƠ CHÁY!',    cls: 'danger',    body: 'risk-alert', sound: true  },
+    4: { text: 'CẢNH BÁO: CÓ CHÁY!',         cls: 'fire',      body: 'fire-alert', sound: true  },
+  };
+
+  const s = STATES[level];
+  statusText.textContent = s.text;
+  statusEl.className     = `system-status ${s.cls}`;
+
+  document.body.classList.remove('risk-alert', 'fire-alert');
+  if (s.body) document.body.classList.add(s.body);
+
+  if (s.sound) {
     if (audioUnlocked && alarmEl.paused) alarmEl.play().catch(() => {});
   } else {
-    statusText.textContent  = 'HỆ THỐNG AN TOÀN';
-    statusEl.className      = 'system-status safe';
-    document.body.classList.remove('fire-alert');
     if (!alarmEl.paused) { alarmEl.pause(); alarmEl.currentTime = 0; }
   }
 }
@@ -257,9 +280,9 @@ client.on('message', (topic, payload) => {
   el(`co2-${key}`).textContent  = co2;
   el(`tvoc-${key}`).textContent = tvoc;
 
-  // Highlight từng giá trị vượt ngưỡng (chỉ hiển thị màu đỏ trên ô đó)
-  el(`temp-${key}`).classList.toggle('alert', temp > TEMP_THRESHOLD);
-  el(`co2-${key}`).classList.toggle('alert',  co2  > CO2_THRESHOLD);
+  // Highlight ô giá trị khi vượt ngưỡng cảnh báo
+  el(`temp-${key}`).classList.toggle('alert', temp > TEMP_WARN);
+  el(`co2-${key}`).classList.toggle('alert',  co2  > CO2_WARN);
 
   // Store latest for alert evaluation
   latestData[key] = { temperature: temp, co2 };

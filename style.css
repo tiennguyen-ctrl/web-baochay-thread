@@ -33,15 +33,19 @@ body {
   transition: background-color 0.2s ease;
 }
 
-/* ── FIRE ALERT FLASH ──────────────────────────────────────────────────────── */
+/* ── BODY ALERT ANIMATIONS ─────────────────────────────────────────────────── */
 @keyframes fire-flash {
   0%, 100% { background-color: var(--bg); }
   50%       { background-color: rgba(255, 23, 68, 0.2); }
 }
 
-body.fire-alert {
-  animation: fire-flash 0.7s ease-in-out infinite;
+@keyframes risk-pulse {
+  0%, 100% { background-color: var(--bg); }
+  50%       { background-color: rgba(255, 152, 0, 0.12); }
 }
+
+body.fire-alert { animation: fire-flash 0.7s ease-in-out infinite; }
+body.risk-alert { animation: risk-pulse 1.2s ease-in-out infinite; }
 
 /* ── HEADER ────────────────────────────────────────────────────────────────── */
 .site-header {
@@ -147,12 +151,48 @@ body.fire-alert {
   text-shadow: 0 0 12px rgba(0, 230, 118, 0.5);
 }
 
+/* Mức 1: Nhiệt độ cao – vàng cam, không còi */
+.system-status.warn-temp {
+  background: rgba(255, 183, 77, 0.12);
+  border-color: rgba(255, 183, 77, 0.5);
+  color: #ffb74d;
+  text-shadow: 0 0 10px rgba(255, 183, 77, 0.5);
+}
+
+/* Mức 2: CO2 cao – tím nhạt, không còi */
+.system-status.warn-co2 {
+  background: rgba(206, 147, 216, 0.12);
+  border-color: rgba(206, 147, 216, 0.5);
+  color: #ce93d8;
+  text-shadow: 0 0 10px rgba(206, 147, 216, 0.5);
+}
+
+/* Mức 3: Nguy cơ cháy – cam đỏ, có còi, nhấp nháy nhẹ */
+@keyframes pulse-danger {
+  0%, 100% { box-shadow: 0 0 12px rgba(255, 87, 34, 0.4); }
+  50%       { box-shadow: 0 0 40px rgba(255, 87, 34, 0.9), 0 0 80px rgba(255, 87, 34, 0.25); }
+}
+
 .system-status.danger {
-  background: rgba(255, 23, 68, 0.15);
+  background: rgba(255, 87, 34, 0.15);
+  border-color: #ff5722;
+  color: #ff8a65;
+  text-shadow: 0 0 12px rgba(255, 87, 34, 0.8);
+  animation: pulse-danger 1s ease-in-out infinite;
+}
+
+/* Mức 4: Có cháy – đỏ rực, còi, nhấp nháy mạnh */
+.system-status.fire {
+  background: rgba(255, 23, 68, 0.18);
   border-color: var(--danger);
   color: #fff;
-  text-shadow: 0 0 12px rgba(255, 23, 68, 0.8);
-  animation: pulse-danger 0.8s ease-in-out infinite;
+  text-shadow: 0 0 14px rgba(255, 23, 68, 0.9);
+  animation: pulse-danger-fire 0.7s ease-in-out infinite;
+}
+
+@keyframes pulse-danger-fire {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 23, 68, 0.5); }
+  50%       { box-shadow: 0 0 50px rgba(255, 23, 68, 1), 0 0 100px rgba(255, 23, 68, 0.4); }
 }
 
 /* Animated indicator dot */
