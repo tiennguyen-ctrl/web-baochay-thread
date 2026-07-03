@@ -191,32 +191,40 @@ el('start-btn').addEventListener('click', () => {
 });
 
 function checkAlerts() {
-  // Tìm mức cảnh báo cao nhất trong tất cả các node
-  // 0 = an toàn | 1 = nhiệt độ cao | 2 = CO2 cao | 3 = nguy cơ cháy | 4 = có cháy
-  let level = 0;
+  let maxLevel  = 0;
+  let hasLevel1 = false; // có ít nhất 1 node chỉ nhiệt độ cao
+  let hasLevel2 = false; // có ít nhất 1 node chỉ CO2 cao
 
   Object.values(latestData).forEach(d => {
     const t = d.temperature;
     const c = d.co2;
     let nodeLevel = 0;
 
-    if      (t > TEMP_FIRE && c > CO2_FIRE)      nodeLevel = 4; // cả 2 vượt ngưỡng cháy
-    else if (t > TEMP_WARN && c > CO2_WARN)      nodeLevel = 3; // cả 2 vượt ngưỡng warn
-    else if (t > TEMP_WARN && c <= CO2_WARN)     nodeLevel = 1; // chỉ nhiệt độ cao
-    else if (c > CO2_WARN  && t <= TEMP_WARN)    nodeLevel = 2; // chỉ CO2 cao
+    if      (t > TEMP_FIRE && c > CO2_FIRE)   nodeLevel = 4;
+    else if (t > TEMP_WARN && c > CO2_WARN)   nodeLevel = 3;
+    else if (t > TEMP_WARN && c <= CO2_WARN)  nodeLevel = 1;
+    else if (c > CO2_WARN  && t <= TEMP_WARN) nodeLevel = 2;
 
-    if (nodeLevel > level) level = nodeLevel;
+    if (nodeLevel === 1) hasLevel1 = true;
+    if (nodeLevel === 2) hasLevel2 = true;
+    if (nodeLevel > maxLevel) maxLevel = nodeLevel;
   });
 
+  // Mức 1+2: có node nhiệt độ cao VÀ node CO2 cao nhưng chưa có node mức 3/4
+  const combined = (maxLevel <= 2 && hasLevel1 && hasLevel2);
+
   const STATES = {
-    0: { text: 'HỆ THỐNG AN TOÀN',           cls: 'safe',      body: '',           sound: false },
-    1: { text: 'CẢNH BÁO: NHIỆT ĐỘ CAO',     cls: 'warn-temp', body: '',           sound: false },
-    2: { text: 'CẢNH BÁO: NỒNG ĐỘ CO₂ CAO',  cls: 'warn-co2',  body: '',           sound: false },
-    3: { text: 'CẢNH BÁO: NGUY CƠ CHÁY!',    cls: 'danger',    body: 'risk-alert', sound: true  },
-    4: { text: 'CẢNH BÁO: CÓ CHÁY!',         cls: 'fire',      body: 'fire-alert', sound: true  },
+    0:  { text: 'HỆ THỐNG AN TOÀN',                   cls: 'safe',      body: '',           sound: false },
+    1:  { text: 'CẢNH BÁO: NHIỆT ĐỘ CAO',             cls: 'warn-temp', body: '',           sound: false },
+    2:  { text: 'CẢNH BÁO: NỒNG ĐỘ CO₂ CAO',          cls: 'warn-co2',  body: '',           sound: false },
+    12: { text: 'CẢNH BÁO: NHIỆT ĐỘ CAO & CO₂ CAO',   cls: 'warn-both', body: '',           sound: false },
+    3:  { text: 'CẢNH BÁO: NGUY CƠ CHÁY!',            cls: 'danger',    body: 'risk-alert', sound: true  },
+    4:  { text: 'CẢNH BÁO: CÓ CHÁY!',                 cls: 'fire',      body: 'fire-alert', sound: true  },
   };
 
-  const s = STATES[level];
+  const stateKey = combined ? 12 : maxLevel;
+  const s = STATES[stateKey];
+
   statusText.textContent = s.text;
   statusEl.className     = `system-status ${s.cls}`;
 

@@ -167,6 +167,14 @@ body.risk-alert { animation: risk-pulse 1.2s ease-in-out infinite; }
   text-shadow: 0 0 10px rgba(206, 147, 216, 0.5);
 }
 
+/* Mức 1+2: nhiệt độ cao & CO2 cao (khác node) – cam, không còi */
+.system-status.warn-both {
+  background: rgba(255, 152, 0, 0.12);
+  border-color: rgba(255, 152, 0, 0.5);
+  color: #ffa726;
+  text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+}
+
 /* Mức 3: Nguy cơ cháy – cam đỏ, có còi, nhấp nháy nhẹ */
 @keyframes pulse-danger {
   0%, 100% { box-shadow: 0 0 12px rgba(255, 87, 34, 0.4); }
