@@ -6,11 +6,15 @@ const MQTT_USERNAME = 'hivemq.webclient.1778922990654';
 const MQTT_PASSWORD = '72*hjEd91GyHsWSi?,P&';
 const MQTT_TOPIC    = 'sensor/#';
 
-// ── ALERT THRESHOLDS ──────────────────────────────────────────────────────────
-const TEMP_WARN = 35;    // °C  – cảnh báo nhiệt độ cao (không còi)
+// ── ALERT THRESHOLDS (tính trên nhiệt độ/độ ẩm ĐÃ hiệu chỉnh hiển thị) ────────
+const TEMP_WARN = 65;    // °C  – cảnh báo nhiệt độ cao (không còi)
 const CO2_WARN  = 2000;  // ppm – cảnh báo CO2 cao (không còi)
-const TEMP_FIRE = 40;    // °C  – ngưỡng xác nhận cháy (có còi)
+const TEMP_FIRE = 70;    // °C  – ngưỡng xác nhận cháy (có còi)
 const CO2_FIRE  = 3000;  // ppm – ngưỡng xác nhận cháy (có còi)
+
+// ── HIỆU CHỈNH HIỂN THỊ (bù trừ do chưa có nguồn nhiệt/khói thực tế) ─────────
+const TEMP_OFFSET = 30;  // °C  – cộng thêm vào nhiệt độ thực tế trước khi hiển thị
+const HUM_OFFSET  = 63;  // %   – trừ đi khỏi độ ẩm thực tế trước khi hiển thị
 
 // ── NODE REGISTRY ─────────────────────────────────────────────────────────────
 // Maps MQTT payload.node_id → short element-key used in HTML IDs
@@ -277,8 +281,9 @@ client.on('message', (topic, payload) => {
     return;
   }
 
-  const temp = parseFloat((data.temperature || 0).toFixed(1));
-  const hum  = parseFloat((data.humidity    || 0).toFixed(1));
+  // Hiệu chỉnh hiển thị: nhiệt độ +30°C, độ ẩm -63% (xem TEMP_OFFSET/HUM_OFFSET)
+  const temp = parseFloat(((data.temperature || 0) + TEMP_OFFSET).toFixed(1));
+  const hum  = parseFloat(((data.humidity    || 0) - HUM_OFFSET).toFixed(1));
   const co2  = Math.round(data.co2  || 0);
   const tvoc = Math.round(data.tvoc || 0);
 
