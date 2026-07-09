@@ -13,8 +13,11 @@ const TEMP_FIRE = 70;    // °C  – ngưỡng xác nhận cháy (có còi)
 const CO2_FIRE  = 3000;  // ppm – ngưỡng xác nhận cháy (có còi)
 
 // ── HIỆU CHỈNH HIỂN THỊ (bù trừ do chưa có nguồn nhiệt/khói thực tế) ─────────
-const TEMP_OFFSET = 30;  // °C  – cộng thêm vào nhiệt độ thực tế trước khi hiển thị
-const HUM_OFFSET  = 63;  // %   – trừ đi khỏi độ ẩm thực tế trước khi hiển thị
+// Chỉ áp dụng khi nhiệt độ thực tế đạt ngưỡng TEMP_TRIGGER; dưới ngưỡng thì
+// hiển thị đúng giá trị thật (không cộng/trừ).
+const TEMP_TRIGGER = 35;  // °C  – nhiệt độ thực tế từ mức này mới bắt đầu hiệu chỉnh
+const TEMP_OFFSET  = 30;  // °C  – cộng thêm vào nhiệt độ thực tế trước khi hiển thị
+const HUM_OFFSET   = 63;  // %   – trừ đi khỏi độ ẩm thực tế trước khi hiển thị
 
 // ── NODE REGISTRY ─────────────────────────────────────────────────────────────
 // Maps MQTT payload.node_id → short element-key used in HTML IDs
@@ -281,9 +284,13 @@ client.on('message', (topic, payload) => {
     return;
   }
 
-  // Hiệu chỉnh hiển thị: nhiệt độ +30°C, độ ẩm -63% (xem TEMP_OFFSET/HUM_OFFSET)
-  const temp = parseFloat(((data.temperature || 0) + TEMP_OFFSET).toFixed(1));
-  const hum  = parseFloat(((data.humidity    || 0) - HUM_OFFSET).toFixed(1));
+  // Hiệu chỉnh hiển thị: chỉ cộng/trừ khi nhiệt độ thực tế đạt TEMP_TRIGGER,
+  // dưới ngưỡng đó hiển thị đúng giá trị thật.
+  const rawTemp = data.temperature || 0;
+  const rawHum  = data.humidity    || 0;
+  const applyOffset = rawTemp >= TEMP_TRIGGER;
+  const temp = parseFloat((applyOffset ? rawTemp + TEMP_OFFSET : rawTemp).toFixed(1));
+  const hum  = parseFloat((applyOffset ? rawHum  - HUM_OFFSET  : rawHum ).toFixed(1));
   const co2  = Math.round(data.co2  || 0);
   const tvoc = Math.round(data.tvoc || 0);
 
